@@ -11,9 +11,11 @@ A Terragrunt Template Catalog for production Infrastructure as Code (IaC) on Goo
 
 This is a **catalog repository**, a collection of reusable IaC components.
 
-This IaC production toolkit follows [Gruntwork's official patterns](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) by using two template repositories:
+This toolkit uses two template repositories:
 - **This repository** (catalog): Build a collection of reusable [modules](./modules), [units](./units/), and [stacks](./stacks/)
-- **Live repository**: Reference these components in your the [infrastructure-live repository](https://github.com/ConsciousML/terragrunt-template-live-gcp) to deploy them in a multi-environment ecosystem with production CI/CD
+- **Live repository**: Reference these components your the [infrastructure-live repository](https://github.com/ConsciousML/terragrunt-template-live-gcp) to deploy them in a multi-environment ecosystem with production CI/CD
+
+You're new to Terragrunt best practices? Read [Gruntwork's official production patterns](https://github.com/gruntwork-io/terragrunt-infrastructure-catalog-example) to get the foundations required to use this extended repository.
 
 ## What's Inside
 
@@ -31,6 +33,10 @@ Modules (modules/) → Units (units/) → Stacks (stacks/) → Examples (example
 - **[CI](docs/continuous-integration.md)**: Automated configuration validation, testing (`terratest`) and documatentation (`terraform-docs`).
 
 ## Getting Started
+### Prerequisites
+- GCP account with billing enabled
+- GitHub account
+- GCP IAM permissions to create service accounts, network, compute, and workload identity pools
 
 ### Fork the Repository
 First, you'll need to fork this repository and make a few changes:
@@ -38,14 +44,36 @@ First, you'll need to fork this repository and make a few changes:
 2. Use your IDE of choice to replace every occurrence of `github.com/ConsciousML/terragrunt-template-catalog-gcp` and `git::git@github.com:ConsciousML/terragrunt-template-catalog-gcp.git` by your GitHub repo URL following the same format
 3. In `examples/` change `region.hcl` and `project.hcl` to match your GCP settings
 
+**Warning**: If you skip step 2, the TG source links will still point to the original repository (on `github.com/ConsciousML/`).
+
 ### Installation
 
 **Option 1: Use mise (recommended)**
 
-First install mise by following their [getting started guide](https://mise.jdx.dev/getting-started.html), then:
+First, `cd` at the root of this repository. 
+
+Next, install mise:
+```bash
+curl https://mise.run | sh
+```
+
+Then, install all the tools in the `mise.toml` file:
 ```bash
 mise install
 ```
+
+Finally, run the following to automatically activate mise when starting a shell:
+- For zsh: 
+```bash
+echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc && source ~/.zshrc
+```
+- For bash:
+```bash
+echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc && source ~/.bashrc
+```
+
+For more information on how to use mise, read their [getting started guide](https://mise.jdx.dev/getting-started.html).
+
 
 **Option 2: Install Tools Manually**
 - [Terragrunt](https://terragrunt.gruntwork.io/docs/getting-started/install/)
@@ -60,6 +88,7 @@ See [mise.toml](./mise.toml) for specific versions.
 
 ### Authenticate with GCP
 ```bash
+gcloud auth login
 gcloud auth application-default login
 ```
 
@@ -77,7 +106,6 @@ terragrunt stack run apply --backend-bootstrap --non-interactive
 - Then cleanup by destroying the infrastructure:
 
 ```bash
-cd examples/stacks/vpc_gce
 terragrunt stack generate
 terragrunt stack run destroy --non-interactive
 ```
